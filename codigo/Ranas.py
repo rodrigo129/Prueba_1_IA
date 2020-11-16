@@ -225,14 +225,47 @@ class Juego_De_Ranas:
                 d += 1
         return d
 
+    def distancia_de_edicion(self,estado_presente,estado_objetivo):
+        d=0
+        Ranas_Verdes_Vistas=0
+        Ranas_Cafe_Vistas=0
+        estado_final=list(estado_objetivo.get_estado())
+        estado_actual=list(estado_presente.get_estado())
+        i=0
+        n=len(estado_actual)
+        print(estado_actual)
+        while i<n:
+            j=estado_final.index(estado_actual[i])
+            if estado_actual[i]=="C":
+                j=j+Ranas_Cafe_Vistas
+                Ranas_Cafe_Vistas+=1
+            if estado_actual[i]=="V":
+                j = n-(1+Ranas_Verdes_Vistas)
+                if estado_actual[j]==estado_actual[i]:
+                    """como el asco esta heuristica y su naturaleza 
+                    asimetrica para indicar las posiciones de cada 
+                    rana, por lo menos se puede areglar de esta 
+                    manera """
+                    j=i
+                Ranas_Verdes_Vistas+=1
+            if i!=j:
+                print("{},{}".format(i,j))
+                print("{} == {}".format(estado_actual[i],
+                                        estado_actual[j]))
+
+            d=d+abs(i-j)
+            print("{}->{}".format(i,d))
+            i+=1
+        return d
+
     def calcular_heuristica(self, estado):
         primero = True
         for final in self.estado_final:
             if primero:
-                distancia = self.distancia_estados(estado, final)
+                distancia = self.distancia_de_edicion(estado, final)
                 primero = False
             else:
-                nueva_distancia = self.distancia_estados(estado, final)
+                nueva_distancia = self.distancia_de_edicion(estado, final)
                 if nueva_distancia < distancia:
                     distancia = nueva_distancia
         estado.set_distancia(distancia)
@@ -309,6 +342,9 @@ class Juego_De_Ranas:
             print("\nElementos en Cola Estados: " + str(len(self.cola_estados)))
 
             #Paso a siguiente iteracion
+            if len(self.cola_estados)==0:
+                print("el algorimo beam no fue capaz de encontrar una solucion, no existe o se encuentra en una rama podada\n")
+                return None
             self.estado_actual = self.pop()
             iteracion += 1
         
